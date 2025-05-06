@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Book struct {
@@ -20,16 +21,16 @@ func main() {
 
 	// Sample data
 	books = append(books, []Book{
-		{ID: "1", Title: "Golang Programming", Author: "John Doe", Price: 29.99},
-		{ID: "2", Title: "Python Basics", Author: "Jane Smith", Price: 24.99},
-		{ID: "3", Title: "JavaScript Advanced", Author: "Mike Johnson", Price: 34.99},
-		{ID: "4", Title: "Docker in Practice", Author: "Sarah Williams", Price: 39.99},
-		{ID: "5", Title: "DevOps Handbook", Author: "Tom Davis", Price: 44.99},
-		{ID: "6", Title: "Microservices Architecture", Author: "Alice Brown", Price: 49.99},
-		{ID: "7", Title: "Cloud Computing", Author: "Robert Wilson", Price: 54.99},
-		{ID: "8", Title: "Kubernetes Guide", Author: "Emily Clark", Price: 45.99},
-		{ID: "9", Title: "API Design Patterns", Author: "David Miller", Price: 32.99},
-		{ID: "10", Title: "System Design", Author: "Lisa Anderson", Price: 59.99},
+		{ID: "1", Title: "Exploring the Cosmos", Author: "Neil Starfield", Price: 49.99},
+		{ID: "2", Title: "Astrophysics for Beginners", Author: "Luna Skywalker", Price: 39.99},
+		{ID: "3", Title: "The Galactic Journey", Author: "Orion Nebula", Price: 59.99},
+		{ID: "4", Title: "Black Holes and Beyond", Author: "Celeste Horizon", Price: 44.99},
+		{ID: "5", Title: "Interstellar Travel", Author: "Nova Lightyear", Price: 54.99},
+		{ID: "6", Title: "The Quantum Universe", Author: "Quasar Photon", Price: 34.99},
+		{ID: "7", Title: "Life on Mars", Author: "Red Planet", Price: 29.99},
+		{ID: "8", Title: "Saturn's Rings", Author: "Titan Orbital", Price: 24.99},
+		{ID: "9", Title: "The Andromeda Mystery", Author: "Galaxy Hunter", Price: 32.99},
+		{ID: "10", Title: "Space Exploration 101", Author: "Cosmo Voyager", Price: 19.99},
 	}...)
 
 	// Define API routes

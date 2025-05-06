@@ -11,7 +11,7 @@ pipeline {
     stages {
          stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Khangvn20/DevOps-Final.git'
+                git branch: 'main', url: 'https://github.com/DoanXemToiLaAi/DevOps-Final-main'
             }
         }
                   stage('Build Docker Image') {
