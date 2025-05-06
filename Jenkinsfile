@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'whyyouask/devops-boks'
         DOCKER_TAG = 'latest'
-        TELEGRAM_BOT_TOKEN = 'your_actual_bot_token'
+        TELEGRAM_BOT_TOKEN = '8046339515:AAEIJtDScmfi0ExQFrk4ATFCKfIJYsFVdJY'
         TELEGRAM_CHAT_ID = '-1002515055682'
     }
 
