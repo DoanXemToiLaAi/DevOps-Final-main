@@ -38,13 +38,21 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 bat '''
-                echo ===== Cleaning up old containers =====
+                echo ===== Stopping and removing old container =====
                 docker stop devops-book || echo Not running
                 docker rm devops-book || echo Not found
 
-                echo ===== Starting new container =====
+                echo ===== Removing old image =====
+                docker image rm %DOCKER_IMAGE%:%DOCKER_TAG% || echo No image to remove
+
+                echo ===== Pulling latest image =====
+                docker pull %DOCKER_IMAGE%:%DOCKER_TAG%
+
+                echo ===== Creating network (if needed) =====
                 docker network create dev || echo Already exists
-                docker run -d --rm --name devops-book -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
+
+                echo ===== Starting new container =====
+                docker run -d --name devops-book -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
         }
