@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'whyyouask/devops-book'
+        DOCKER_IMAGE = 'whyyouask/devops'
         DOCKER_TAG = 'latest'
         TELEGRAM_BOT_TOKEN = '8046339515:AAEIJtDScmfi0ExQFrk4ATFCKfIJYsFVdJY'
         TELEGRAM_CHAT_ID = '-1002515055682'
