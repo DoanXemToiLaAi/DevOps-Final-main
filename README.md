@@ -62,7 +62,7 @@ networks:
 
 1. **Build Docker Image**
 ```bash
-docker build -t whyyouask/devops-book:latest .
+docker build -t whyyouask/devops-boks:latest .
 ```
 
 2. **Run with Docker Compose**
@@ -84,12 +84,12 @@ docker login
 
 2. **Push Image to Docker Hub**
 ```bash
-docker push whyyouask/devops-book:latest
+docker push whyyouask/devops-boks:latest
 ```
 
 3. **Pull Image from Docker Hub**
 ```bash
-docker pull whyyouask/devops-book:latest
+docker pull whyyouask/devops-boks:latest
 ```
 
 ### API Endpoints

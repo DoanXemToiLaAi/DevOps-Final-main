@@ -18,7 +18,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 bat '''
-                echo Building Docker image...
+                echo === CHECKING DIRECTORY ===
+                cd
+                dir
+                echo === BUILDING DOCKER IMAGE ===
                 docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .
                 '''
             }
@@ -28,10 +31,10 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     bat '''
-                    echo Logging in to Docker Hub...
+                    echo === LOGGING IN TO DOCKER HUB ===
                     echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
 
-                    echo Pushing Docker image...
+                    echo === PUSHING IMAGE ===
                     docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                     '''
                 }
@@ -41,20 +44,20 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 bat '''
-                echo Stopping and removing existing container...
+                echo === STOP AND REMOVE OLD CONTAINER ===
                 docker stop devops-boks || echo Container not running
                 docker rm devops-boks || echo Container not found
 
-                echo Removing old image...
-                docker rmi %DOCKER_IMAGE%:%DOCKER_TAG% || echo No image to remove
+                echo === REMOVE OLD IMAGE ===
+                docker rmi %DOCKER_IMAGE%:%DOCKER_TAG% || echo Image not found
 
-                echo Pulling latest image...
+                echo === PULL LATEST IMAGE ===
                 docker pull %DOCKER_IMAGE%:%DOCKER_TAG%
 
-                echo Creating network if not exists...
+                echo === CREATE NETWORK ===
                 docker network create dev || echo Network already exists
 
-                echo Starting container...
+                echo === STARTING NEW CONTAINER ===
                 docker run -d --name devops-boks -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
