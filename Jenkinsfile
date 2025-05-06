@@ -17,7 +17,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "cd DevOps-Final-main && docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% --platform linux/amd64 ."
+                bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% --platform linux/amd64 ."
             }
         }
 
@@ -25,10 +25,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     bat '''
-                    cd DevOps-Final-main
                     echo ===== Logging in to Docker Hub =====
                     echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-
                     echo ===== Pushing Docker Image =====
                     docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                     '''
