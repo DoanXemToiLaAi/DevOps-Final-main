@@ -17,39 +17,29 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    echo '🛠 Building Docker image...'
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "--platform linux/amd64 .")
-                }
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} --platform linux/amd64 ."
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub') {
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                    }
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    '''
                 }
             }
         }
 
-        stage('Deploy Golang to DEV') {
+        stage('Deploy Container') {
             steps {
-                script {
-                    echo '♻️ Clearing previous deployment...'
-                    sh '''
-                        docker container stop server-golang || true
-                        docker container rm server-golang || true
-                        docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG} || true
-                    '''
-
-                    echo '🚀 Deploying new container...'
-                    sh '''
-                        docker network create dev || true
-                        docker run -d --rm --name server-golang -p 4200:4200 --network dev ${DOCKER_IMAGE}:${DOCKER_TAG}
-                    '''
-                }
+                sh '''
+                    docker stop devops-book || true
+                    docker rm devops-book || true
+                    docker network create dev || true
+                    docker run -d --rm --name devops-book -p 4200:4200 --network dev ${DOCKER_IMAGE}:${DOCKER_TAG}
+                '''
             }
         }
     }
@@ -57,12 +47,13 @@ pipeline {
     post {
         success {
             script {
-                sendTelegramMessage("✅ Build #${BUILD_NUMBER} was successful!")
+                sendTelegramMessage("✅ Build #${env.BUILD_NUMBER} thành công trên Jenkins!")
             }
         }
+
         failure {
             script {
-                sendTelegramMessage("❌ Build #${BUILD_NUMBER} failed.")
+                sendTelegramMessage("❌ Build #${env.BUILD_NUMBER} thất bại.")
             }
         }
     }
@@ -70,8 +61,8 @@ pipeline {
 
 def sendTelegramMessage(String message) {
     sh """
-        curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \\
-        -d chat_id=${TELEGRAM_CHAT_ID} \\
+        curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
+        -d chat_id=${TELEGRAM_CHAT_ID} \
         -d text="${message}"
     """
 }
