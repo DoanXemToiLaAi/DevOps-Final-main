@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'whyyouask/devops-book'
         DOCKER_TAG = 'latest'
         TELEGRAM_BOT_TOKEN = '8095963368:AAEkxTTHPG6BjvawtWEa189CF6Gf9NGrlBA'
-        TELEGRAM_CHAT_ID = '5603549047'
+        TELEGRAM_CHAT_ID = '-4715805728'
     }
 
     stages {
