@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'whyyouask/devops'
+        DOCKER_IMAGE = 'whyyouask/devops-boks'
         DOCKER_TAG = 'latest'
         TELEGRAM_BOT_TOKEN = '8046339515:AAEIJtDScmfi0ExQFrk4ATFCKfIJYsFVdJY'
         TELEGRAM_CHAT_ID = '-1002515055682'
@@ -42,8 +42,8 @@ pipeline {
             steps {
                 bat '''
                 echo Stopping and removing existing container...
-                docker stop devops || echo Container not running
-                docker rm devops || echo Container not found
+                docker stop devops-boks || echo Container not running
+                docker rm devops-boks || echo Container not found
 
                 echo Removing old image...
                 docker rmi %DOCKER_IMAGE%:%DOCKER_TAG% || echo No image to remove
@@ -55,7 +55,7 @@ pipeline {
                 docker network create dev || echo Network already exists
 
                 echo Starting container...
-                docker run -d --name devops -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
+                docker run -d --name devops-boks -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
         }
