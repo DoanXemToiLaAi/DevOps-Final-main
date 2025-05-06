@@ -1,0 +1,7 @@
+docker-workflow:latest
+git:latest
+workflow-aggregator:latest
+docker-plugin:latest
+docker-compose-build-step:latest
+credentials-binding:latest
+golang:latest
