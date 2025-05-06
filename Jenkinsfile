@@ -17,16 +17,16 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} --platform linux/amd64 ."
+                bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% --platform linux/amd64 ."
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    bat '''
+                    echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                     '''
                 }
             }
@@ -34,11 +34,11 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                sh '''
-                    docker stop devops-book || true
-                    docker rm devops-book || true
-                    docker network create dev || true
-                    docker run -d --rm --name devops-book -p 4200:4200 --network dev ${DOCKER_IMAGE}:${DOCKER_TAG}
+                bat '''
+                docker stop devops-book || echo "Not running"
+                docker rm devops-book || echo "Not found"
+                docker network create dev || echo "Already exists"
+                docker run -d --rm --name devops-book -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
         }
@@ -60,9 +60,9 @@ pipeline {
 }
 
 def sendTelegramMessage(String message) {
-    sh """
-        curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
-        -d chat_id=${TELEGRAM_CHAT_ID} \
-        -d text="${message}"
+    bat """
+    curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage ^
+    -d chat_id=${TELEGRAM_CHAT_ID} ^
+    -d text="${message}"
     """
 }
