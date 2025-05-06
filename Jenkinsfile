@@ -25,7 +25,10 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     bat '''
+                    echo ===== Logging in to Docker Hub =====
                     echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+
+                    echo ===== Pushing Docker Image =====
                     docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                     '''
                 }
@@ -35,9 +38,12 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 bat '''
-                docker stop devops-book || echo "Not running"
-                docker rm devops-book || echo "Not found"
-                docker network create dev || echo "Already exists"
+                echo ===== Cleaning up old containers =====
+                docker stop devops-book || echo Not running
+                docker rm devops-book || echo Not found
+
+                echo ===== Starting new container =====
+                docker network create dev || echo Already exists
                 docker run -d --rm --name devops-book -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
@@ -47,13 +53,13 @@ pipeline {
     post {
         success {
             script {
-                sendTelegramMessage("✅ Build #${env.BUILD_NUMBER} thành công trên Jenkins!")
+                sendTelegramMessage("Build #${env.BUILD_NUMBER} completed successfully.")
             }
         }
 
         failure {
             script {
-                sendTelegramMessage("❌ Build #${env.BUILD_NUMBER} thất bại.")
+                sendTelegramMessage("Build #${env.BUILD_NUMBER} failed. Please check Jenkins logs.")
             }
         }
     }
