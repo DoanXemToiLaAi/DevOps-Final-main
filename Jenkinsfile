@@ -17,7 +17,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% --platform linux/amd64 ."
+                bat '''
+                echo Building Docker image...
+                docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .
+                '''
             }
         }
 
@@ -25,9 +28,10 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     bat '''
-                    echo ===== Logging in to Docker Hub =====
+                    echo Logging in to Docker Hub...
                     echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-                    echo ===== Pushing Docker Image =====
+
+                    echo Pushing Docker image...
                     docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                     '''
                 }
@@ -37,20 +41,20 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 bat '''
-                echo ===== Stopping and removing old container =====
-                docker stop devops-book || echo Not running
-                docker rm devops-book || echo Not found
+                echo Stopping and removing existing container...
+                docker stop devops-book || echo Container not running
+                docker rm devops-book || echo Container not found
 
-                echo ===== Removing old image =====
-                docker image rm %DOCKER_IMAGE%:%DOCKER_TAG% || echo No image to remove
+                echo Removing old image...
+                docker rmi %DOCKER_IMAGE%:%DOCKER_TAG% || echo No image to remove
 
-                echo ===== Pulling latest image =====
+                echo Pulling latest image...
                 docker pull %DOCKER_IMAGE%:%DOCKER_TAG%
 
-                echo ===== Creating network (if needed) =====
-                docker network create dev || echo Already exists
+                echo Creating network if not exists...
+                docker network create dev || echo Network already exists
 
-                echo ===== Starting new container =====
+                echo Starting container...
                 docker run -d --name devops-book -p 4200:4200 --network dev %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
@@ -60,13 +64,12 @@ pipeline {
     post {
         success {
             script {
-                sendTelegramMessage("Build #${env.BUILD_NUMBER} completed successfully.")
+                sendTelegramMessage("✅ Build #${env.BUILD_NUMBER} was successful!")
             }
         }
-
         failure {
             script {
-                sendTelegramMessage("Build #${env.BUILD_NUMBER} failed. Please check Jenkins logs.")
+                sendTelegramMessage("❌ Build #${env.BUILD_NUMBER} failed. Please check Jenkins logs.")
             }
         }
     }
